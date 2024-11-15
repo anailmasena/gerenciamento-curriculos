@@ -98,7 +98,7 @@ def upload_curriculo(id_aluno):
         )
         cursor = conn.cursor()
 
-        # Inserir o BLOB no banco, agora sem o caminho_arquivo
+        # Inserir o BLOB no banco
         query = """
         INSERT INTO curriculos (arquivo, id_aluno)
         VALUES (%s, %s)
@@ -193,7 +193,7 @@ def confirmar_edicao(id_aluno):
     cursor.execute(query, (nome, email, telefone, nivel_ensino, area_emprego, id_aluno))
     conn.commit()
 
-    # Perguntar se o usuário quer atualizar o currículo
+
     resposta = messagebox.askyesno("Atualizar Currículo", "Deseja atualizar o currículo para este aluno?")
     if resposta:
         # Escolher o novo arquivo de currículo
