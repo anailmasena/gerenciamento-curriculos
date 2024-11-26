@@ -9,9 +9,8 @@ from PIL import Image, ImageTk
 from io import BytesIO
 import logging
 
-diretorio_atual = os.getcwd()  # Pega o diretório atual
+diretorio_atual = os.getcwd()  
 
-# Função para baixar e abrir a imagem da logo
 def load_logo():
     url = "https://www.abcdacomunicacao.com.br/wp-content/uploads/image001-21.png"
     response = requests.get(url)
@@ -20,7 +19,7 @@ def load_logo():
     img.thumbnail((200, 200), Image.LANCZOS)
     return ImageTk.PhotoImage(img)
 
-# Configuração do log
+
 logging.basicConfig(filename='erro.log', level=logging.ERROR)
 
 try:
@@ -70,7 +69,7 @@ def cadastrar_aluno():
     messagebox.showinfo("Sucesso", "Cadastro realizado com sucesso!")
     exibir_ultimos_cadastrados()
 
-    # Limpar os campos
+  
     nome_entry.delete(0, tk.END)
     email_entry.delete(0, tk.END)
     telefone_entry.delete(0, tk.END)
@@ -80,16 +79,16 @@ def cadastrar_aluno():
     cadastrar_button.config(text="Cadastrar e Upload Currículo", command=cadastrar_aluno)
 
 def upload_curriculo(id_aluno):
-    # Abrir janela para selecionar arquivo
+  
     caminho_pdf = filedialog.askopenfilename(title="Selecione o currículo", filetypes=[("Arquivos PDF", "*.pdf")])
     
-    # Verificar se o usuário selecionou um arquivo
+    
     if caminho_pdf:
-        # Ler o conteúdo do arquivo PDF
+        
         with open(caminho_pdf, "rb") as file:
             blob_data = file.read()
         
-        # Conectar ao banco de dados e inserir o BLOB
+        
         conn = mysql.connector.connect(
             host="192.168.1.24",
             user="root",
@@ -98,14 +97,14 @@ def upload_curriculo(id_aluno):
         )
         cursor = conn.cursor()
 
-        # Inserir o BLOB no banco
+        
         query = """
         INSERT INTO curriculos (arquivo, id_aluno)
         VALUES (%s, %s)
         """
         cursor.execute(query, (blob_data, id_aluno))
 
-        # Confirmar transação e fechar conexão
+        
         conn.commit()
         cursor.close()
         conn.close()
@@ -188,7 +187,7 @@ def confirmar_edicao(id_aluno):
         messagebox.showwarning("Atenção", "Por favor, preencha todos os campos.")
         return
 
-    # Atualizar dados básicos do aluno
+    
     query = "UPDATE alunos SET nome = %s, email = %s, telefone = %s, nivel_ensino = %s, area_emprego = %s WHERE id_aluno = %s"
     cursor.execute(query, (nome, email, telefone, nivel_ensino, area_emprego, id_aluno))
     conn.commit()
@@ -196,21 +195,21 @@ def confirmar_edicao(id_aluno):
 
     resposta = messagebox.askyesno("Atualizar Currículo", "Deseja atualizar o currículo para este aluno?")
     if resposta:
-        # Escolher o novo arquivo de currículo
+        
         arquivo_path = filedialog.askopenfilename(title="Selecione o novo currículo em PDF", filetypes=[("PDF Files", "*.pdf")])
         if arquivo_path:
-            # Ler o conteúdo do PDF como binário
+            
             with open(arquivo_path, "rb") as file:
                 blob_data = file.read()
             
-            # Atualizar o currículo no banco de dados
+            
             query_curriculo = "UPDATE curriculos SET arquivo = %s WHERE id_aluno = %s"
             cursor.execute(query_curriculo, (blob_data, id_aluno))
             conn.commit()
 
     messagebox.showinfo("Sucesso", "Dados do aluno e currículo atualizados com sucesso!")
     
-    # Limpar os campos
+    
     nome_entry.delete(0, tk.END)
     email_entry.delete(0, tk.END)
     telefone_entry.delete(0, tk.END)
@@ -246,16 +245,16 @@ def abrir_curriculo(event=None):
         return
 
     curriculo = lista_curriculos.item(selecionado)["values"]
-    id_aluno = curriculo[0]  # ID do aluno para consulta
+    id_aluno = curriculo[0]  
 
-    # Recupera o arquivo do banco de dados
+    
     cursor.execute("SELECT arquivo FROM curriculos WHERE id_aluno = %s", (id_aluno,))
     result = cursor.fetchone()
     if result and result[0]:
-        with open("curriculo_temp.pdf", "wb") as file:  # Salva o arquivo temporariamente
+        with open("curriculo_temp.pdf", "wb") as file:  
             file.write(result[0])
 
-        os.startfile("curriculo_temp.pdf")  # Abre o PDF com o programa padrão
+        os.startfile("curriculo_temp.pdf") 
     else:
         messagebox.showwarning("Erro", "Arquivo de currículo não encontrado no banco de dados.")
 
@@ -263,17 +262,17 @@ def abrir_curriculo(event=None):
 
 
 
-# Configuração da interface gráfica
+
 root = tk.Tk()
 root.title("Gerenciamento de Currículos")
 root.state('zoomed')
 
-# Logo
+
 logo_image = load_logo()
 logo_label = tk.Label(root, image=logo_image)
 logo_label.grid(row=0, column=0, columnspan=2, pady=(10, 20))
 
-# Configura os campos de entrada em duas colunas
+
 tk.Label(root, text="Nome:").grid(row=1, column=0, sticky="e", padx=5, pady=5)
 nome_entry = tk.Entry(root)
 nome_entry.grid(row=1, column=1, sticky="w", padx=5, pady=5)
@@ -311,7 +310,7 @@ tk.Radiobutton(frame_status, text="Inativo", variable=status_var, value='Inativo
 cadastrar_button = tk.Button(root, text="Cadastrar e Upload Currículo", command=cadastrar_aluno)
 cadastrar_button.grid(row=8, column=1, pady=10, padx=5, sticky="w")
 
-# Campo de busca e botões de ação
+
 busca_frame = Frame(root)
 busca_frame.grid(row=9, column=0, columnspan=2, pady=10)
 
@@ -331,7 +330,7 @@ remove_button.grid(row=0, column=4, padx=5)
 abrir_button = tk.Button(busca_frame, text="Abrir Currículo", command=abrir_curriculo)
 abrir_button.grid(row=0, column=5, padx=5)
 
-# Treeview para exibir currículos e últimos cadastrados
+
 cols = ("ID", "Nome", "Email", "Telefone", "Área", "Nível", "Status")  
 lista_curriculos = ttk.Treeview(root, columns=cols, show="headings")
 for col in cols:
@@ -340,10 +339,10 @@ for col in cols:
 
 lista_curriculos.grid(row=10, column=0, columnspan=2, sticky="nsew")
 
-# Associar a função ao evento de duplo clique
+
 lista_curriculos.bind("<Double-1>", abrir_curriculo)
 
-# Configurar as proporções de peso
+
 root.grid_rowconfigure(10, weight=1)
 root.grid_columnconfigure(0, weight=1)
 root.grid_columnconfigure(1, weight=1)
